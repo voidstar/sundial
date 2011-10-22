@@ -1,18 +1,38 @@
 == Description
 
 Sundial is a REST based Web Service for scheduling recurring tasks.
-It uses the Quartz Scheduler [http://quartz-scheduler.org/documentation/quartz-2.1.x/quick-start] and sits
+It uses the {Quartz Scheduler}[http://quartz-scheduler.org/documentation/quartz-2.1.x/quick-start] and sits
 in a Glassfish [] or JBoss [] application server.
 
 == Usage
 
   https:://localhost:7080/scheduler?options
 
-  where options include
-  opts = {'cron': '******',
+where options include jsons data that will be posted back to callback url
+
+  options = {'cron': '******',
           'client_url': '<callback work url>',
           'args': { 'worker': 'MyTask',
                     'id': 'task_id'}
          }
+
+== Options
+
+Argument options for scheduler API include
+
+[client_url] The URL the service will call at the scheduled time
+
+[args] Arguments to be posted to the callback URL at the scheduled time. *Must be in JSON notation*
+
+[cron] The cront tab notation used to set schedule (TODO: implemnent natural language parsing with chronic)
+
+  * * * * * *
+  | | | | | |
+  | | | | | +-- Year              (range: 1900-3000)
+  | | | | +---- Day of the Week   (range: 1-7, 1 standing for Monday)
+  | | | +------ Month of the Year (range: 1-12)
+  | | +-------- Day of the Month  (range: 1-31)
+  | +---------- Hour              (range: 0-23)
+  +------------ Minute            (range: 0-59)
 
 
