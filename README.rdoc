@@ -1,0 +1,18 @@
+== Description
+
+Sundial is a REST based Web Service for scheduling recurring tasks.
+It uses the Quartz Scheduler [http://quartz-scheduler.org/documentation/quartz-2.1.x/quick-start] and sits
+in a Glassfish [] or JBoss [] application server.
+
+== Usage
+
+  https:://localhost:7080/scheduler?options
+
+  where options include
+  opts = {'cron': '******',
+          'client_url': '<callback work url>',
+          'args': { 'worker': 'MyTask',
+                    'id': 'task_id'}
+         }
+
+
