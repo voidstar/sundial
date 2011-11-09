@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Callback url:</b>
+  <%= @schedule.callback_url %>
+</p>
+
+<p>
+  <b>Cron:</b>
+  <%= @schedule.cron %>
+</p>
+
+<p>
+  <b>Callback params:</b>
+  <%= @schedule.callback_params %>
+</p>
+
+<p>
+  <b>Timing:</b>
+  <%= @schedule.timing %>
+</p>
+
+
+<%= link_to 'Edit', edit_schedule_path(@schedule) %> |
+<%= link_to 'Back', schedules_path %>

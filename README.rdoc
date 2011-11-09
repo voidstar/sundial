@@ -1,38 +1,56 @@
 == Description
 
 Sundial is a REST based Web Service for scheduling recurring tasks.
-It uses the {Quartz Scheduler}[http://quartz-scheduler.org/documentation/quartz-2.1.x/quick-start] and sits
-in a Glassfish [] or JBoss [] application server.
+It uses the {Quartz Scheduler}[http://quartz-scheduler.org/documentation/quartz-2.1.x/quick-start] API.
 
 == Usage
 
   https:://localhost:7080/scheduler?options
 
+  Method: POST
+
 where options include jsons data that will be posted back to callback url
 
-  options = {'cron': '******',
-          'client_url': '<callback work url>',
-          'args': { 'worker': 'MyTask',
-                    'id': 'task_id'}
-         }
+  <tt>
+  options = { 'name' : 'mytaskname',
+              'group' : 'mytaskgroup',
+              'cron': '******',
+              'client_url': '<callback work url>',
+              'args': { 'worker': 'MyTask',
+                        'id': 'task_id'
+                      }
+            }
+  </tt>
 
 == Options
 
 Argument options for scheduler API include
 
-[client_url] The URL the service will call at the scheduled time
+[name] Name of the scheduled task _optional_. Defaults to 'DefaultJob'
 
-[args] Arguments to be posted to the callback URL at the scheduled time. *Must be in JSON notation*
+[group] Group of the scheduled task _optional_.  Defaults to 'DefaultGroup'
 
-[cron] The cront tab notation used to set schedule (TODO: implemnent natural language parsing with chronic)
+[client_url] The URL the service will call at the scheduled time _required_.
 
-  * * * * * *
-  | | | | | |
-  | | | | | +-- Year              (range: 1900-3000)
-  | | | | +---- Day of the Week   (range: 1-7, 1 standing for Monday)
-  | | | +------ Month of the Year (range: 1-12)
-  | | +-------- Day of the Month  (range: 1-31)
-  | +---------- Hour              (range: 0-23)
-  +------------ Minute            (range: 0-59)
+[args] Arguments to be posted to the callback URL at the scheduled time _optional_. <b>Must be in {JSON notation}[http://www.json.org/]</b>
+
+[timez_zone] The time zone for the cron expression
+
+[cron] The cront tab notation used to set schedule (TODO: implemnent natural language parsing with chronic) _required_. Note: These cront tabs expressions are unique to quartz as they allow seconds.  See links below
+
+  * * * * * * *
+  | | | | | | |
+  | | | | | | +-- Year              (empty, 1970-2199), (, - * /)
+  | | | | | +---- Day of Week       (1-7 or SUN-SAT), (, - * /)
+  | | | | +------ Month             (range: 1-12 OR JAN-DEC), (, - * /)
+  | | | +-------- Day of the Month  (range: 1-31), (, - * ? / L W)
+  | | +---------- Hour              (range: 0-23), (, - * /)
+  | +------------ Minute            (range: 0-59), (, - * ? / L #)
+  +-------------- Second            (range: 0-59), (, - * /)
+
+  {cron fields for quartz}[http://www.quartz-scheduler.org/api/2.1.0/org/quartz/CronExpression.html]
+  {cron examples}[http://www.quartz-scheduler.org/api/2.1.0/org/quartz/CronTrigger.html]
+
+
 
 

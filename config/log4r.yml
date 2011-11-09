@@ -1,0 +1,59 @@
+# Rails Log4r Configuration
+
+log4r_config:
+  pre_config:
+    custom_levels:
+      - DEBUG
+      - INFO
+      - WARN
+      - ERROR
+      - FATAL
+    global:
+      level: DEBUG
+    root:
+      level: DEBUG
+
+  #------------------------------------------
+  # Define Loggers
+  #------------------------------------------
+  loggers:
+    - name      : default
+      level     : DEBUG
+      additive  : 'false'
+      trace     : 'true'      
+      outputters:
+      - default
+    - name      : rails
+      level     : DEBUG
+      trace     : 'true'      
+      outputters: 
+        - default
+    - name      : sql
+      level     : DEBUG
+      trace     : 'true'
+      outputters:
+        - sql
+
+  #------------------------------------------
+  # define all log outputters and formatters
+  #------------------------------------------
+  outputters:
+    - type     : FileOutputter
+      name     : default 
+      level    : DEBUG
+      trunc    : 'false'
+      filename : "#{RAILS_ROOT}/log/#{RAILS_ENV}.log"
+      formatter:
+        date_pattern: '%Y-%m-%d %H:%M:%S'
+        pattern     : '[%l - %c] %d :: %M '
+        type        : Log4r::PatternFormatter
+    - type     : FileOutputter
+      name     : sql
+      level    : DEBUG
+      trunc    : 'false'
+      filename : "#{RAILS_ROOT}/log/sql_#{RAILS_ENV}.log"
+      formatter:
+        date_pattern: '%Y-%m-%d %H:%M:%S'
+        pattern     : '[%l - %c] %d :: %M '
+        type        : Log4r::PatternFormatter
+

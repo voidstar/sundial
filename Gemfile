@@ -1,3 +1,4 @@
+# source "http://torquebox.org/2x/builds/557/gem-repo"
 source 'http://rubygems.org'
 
 gem 'rails', '3.0.7'
@@ -12,8 +13,16 @@ end
 platforms :jruby do
   gem 'activerecord-jdbc-adapter'
   gem 'jdbc-mysql', :require => false
+  gem "activerecord-jdbc-adapter", :require => "arjdbc"
+  gem "jdbc-sqlite3"
+  gem "jruby-openssl"
 end
 
+# Utility Gems
+gem 'pry'
+gem 'pry-doc'
+gem 'pry-rails'
+gem 'log4r'
 
 # Use unicorn as the web server
 # gem 'unicorn'
@@ -37,3 +46,13 @@ end
 # group :development, :test do
 #   gem 'webrat'
 # end
+group :development, :test do
+  gem 'rspec'
+  gem 'rspec-rails'
+
+  # Deploy with Capistrano
+  gem 'capistrano'
+  gem 'capistrano-ext'
+
+end
+
