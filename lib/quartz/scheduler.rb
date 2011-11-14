@@ -38,6 +38,7 @@ module Quartz
 
         RemoteJob.to_java(org.quartz.Job)
         job_detail = Quartz::JobDetail.new(schedule.name, schedule.group, RemoteJob.new)
+        job_detail.schedule_id = schedule.id
 
         trigger = TriggerBuilder.newTrigger()\
         .withIdentity("#{schedule.name}_trigger", schedule.group)\

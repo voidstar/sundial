@@ -16,6 +16,7 @@ java_import org.slf4j.LoggerFactory
 # Include Java Classes we know  we'll need
 
 java_import org.quartz.Job
+java_import org.quartz.JobKey
 java_import org.quartz.JobBuilder
 java_import org.quartz.JobDetail
 java_import org.quartz.impl.JobDetailImpl

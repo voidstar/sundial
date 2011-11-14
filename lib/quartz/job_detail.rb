@@ -1,6 +1,7 @@
 module Quartz
   class JobDetail < Java::OrgQuartzImpl::JobDetailImpl
     attr_accessor :job
+    attr_accessor :schedule_id
 
     def initialize(name,group,job)
       super()

@@ -14,6 +14,7 @@ class Schedule < ActiveRecord::Base
       s.cron = params[:cron]
       s.time_zone = params[:time_zone]
       s.callback_url = params[:callback_url]
+      s.callback_params = params[:callback_params]
       return s
     end
 

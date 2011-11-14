@@ -43,22 +43,31 @@ class SchedulesController < ApplicationController
   # POST /schedules
   # POST /schedules.xml
   def create
+
+    # Get schedule json object from parameters
+    schedule_params = params[:schedule] ||= {}
+
     # Find if schedule has been created already
     # find by name and group
-    @schedule = Schedule.find_by_name_and_group(params[:name], params[:group])
+    @schedule = Schedule.find_by_name_and_group(schedule_params[:name], schedule_params[:group])
 
     if @schedule
+
+      # Check to see if the schedule is registered with Quartz (after restart or removal, etc)
+      key = JobKey.new(@schedule.name, @schedule.group)
+      unless RemoteJobScheduler.instance.scheduler.check_exists(key)
+        RemoteJobScheduler.instance.build_schedule(@schedule)
+      end
+
       render :json => {:schedule_id => @schedule.id, :msg => 'schedule already exists'}
     else
 
-      @schedule = Schedule.build(params[:schedule])
+      @schedule = Schedule.build(schedule_params)
 
       if @schedule.save
         begin
-
           RemoteJobScheduler.instance.build_schedule(@schedule)
           render :json => {:schedule_id => @schedule.id}
-
         rescue => e
           render :json => {:error => e.message}
         end
