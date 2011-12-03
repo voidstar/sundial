@@ -23,9 +23,9 @@ role :app, domain                          # This may be the same as your `Web` 
 role :db,  domain, :primary => true # This is where Rails migrations will run
 # role :db,  "your slave db-server here"
 
-set :torquebox_exec, "/home/#{user}/.rbenv/shims/torquebox"
-set :torquebox_args, "JBOSS_PIDFILE=#{current_path}/tmp/pids/jboss.pid LAUNCH_JBOSS_IN_BACKGROUND=Y"
-
+# set :torquebox_exec, "/home/#{user}/.rbenv/shims/torquebox"
+# set :torquebox_args, "JBOSS_PIDFILE=#{current_path}/tmp/pids/jboss.pid LAUNCH_JBOSS_IN_BACKGROUND=Y"
+=begin
 namespace :torquebox do
 
   #JBOSS_PIDFILE=#{current_path}}/tmp/jboss.pid LAUNCH_JBOSS_IN_BACKGROUND=t torquebox run &
@@ -62,4 +62,4 @@ namespace :torquebox do
   end
 
 end
-
+=end

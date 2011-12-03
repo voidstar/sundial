@@ -1,3 +1,4 @@
+
 Dir.glob(File.join(Rails.root.to_s, '/lib/java/*.jar')).each {|f| require f }
 
 libdir = Rails.root.to_s + "/lib"
@@ -34,5 +35,10 @@ java_import org.quartz.TriggerBuilder
 
 require 'remote_job_scheduler'
 
-RemoteJobScheduler.instance.run
+run_quartz = (!ENV['RUN_QUARTZ'].nil? || ENV['RUN_QUARTZ'] == 'true') ? true : false
+
+if run_quartz
+  RemoteJobScheduler.instance.run
+end
+
 
