@@ -26,22 +26,11 @@ set :bundle_exec, "RAILS_ENV=#{rails_env} bundle exec"
 # Torquebox Setup for Rails
 namespace :deploy do
 
-   task :start, :roles => :app, :except => { :no_release => true }do 
-   ;
-   end
-   task :stop, :roles => :app, :except => { :no_release => true }do 
-   ;
-   end
-
-   task :restart, :roles => :app, :except => { :no_release => true } do
-    :stop
-    :start
-   end
+   task :start do ; end
+   task :stop do ; end
 
    after "deploy:update_code", :link_production_db
-   after "deploy:symlink", :link_production_db, "torquebox:deploy"
    after "deploy", "deploy:cleanup"
-
   # TODO: Add Jammit, Uglifier, Closuer, etc
 end
 

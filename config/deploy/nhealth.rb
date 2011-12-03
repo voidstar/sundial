@@ -24,20 +24,35 @@ role :db,  domain, :primary => true # This is where Rails migrations will run
 # role :db,  "your slave db-server here"
 
 set :torquebox_exec, "/home/#{user}/.rbenv/shims/torquebox"
+set :torquebox_args, "JBOSS_PIDFILE=#{current_path}/tmp/pids/jboss.pid LAUNCH_JBOSS_IN_BACKGROUND=Y"
 
 namespace :torquebox do
+
+  #JBOSS_PIDFILE=#{current_path}}/tmp/jboss.pid LAUNCH_JBOSS_IN_BACKGROUND=t torquebox run &
 
   desc "Deploy Sundial application to torquebox"
   task :deploy, roles => :app, :except => {:no_release => true} do
     run "cd #{current_path} && #{torquebox_exec} deploy ."
   end
 
+  desc "Stopping Sundial application in background"
   task :start, roles => :app, :except => {:no_release => true} do
-    run "cd #{current_path} && #{torquebox_exec} start -b 0.0.0.0"
+    run <<-CMD
+      cd #{current_path}
+      mkdir -p #{current_path}/tmp/pids
+      JBOSS_PIDFILE=#{current_path}/tmp/pids
+      #{torquebox_args} #{torquebox_exec} run -b 0.0.0.0
+    CMD
+
   end
 
+  desc "Stopping Sundial application using pid file"
   task :stop, roles => :app, :except => {:no_release => true} do
-    run "cd #{current_path} && #{torquebox_exec} stop"
+    run <<-CMD
+      cd #{current_path}
+      proc=`cat tmp/pids/jboss.pid`
+      kill $proc
+    CMD
   end
 
   task :restart, roles => :app, :except => {:no_release => true} do
