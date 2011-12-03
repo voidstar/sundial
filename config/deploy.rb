@@ -2,7 +2,7 @@ require "bundler/capistrano"
 require 'capistrano/ext/multistage'
 
 set :keep_releases, 2
-set :stages, %w[nhealth local]
+set :stages, %w[nhealth]
 
 # Include recipes from lib
 Dir['lib/recipes/*.rb'].each { |recipe| load(recipe) }
@@ -23,18 +23,14 @@ set :git_shallow_clone, 1
 set :rails_env, "production"
 set :bundle_exec, "RAILS_ENV=#{rails_env} bundle exec"
 
-# Torquebox Setup for Rails
+# Passenger Setup for Rails
 namespace :deploy do
-
    task :start do ; end
    task :stop do ; end
-
    after "deploy:update_code", :link_production_db
    after "deploy", "deploy:cleanup"
   # TODO: Add Jammit, Uglifier, Closuer, etc
 end
-
-
 
 # database.yml task
 desc "Link in the production database.yml"
