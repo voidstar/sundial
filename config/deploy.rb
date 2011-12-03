@@ -1,6 +1,5 @@
 require "bundler/capistrano"
 require 'capistrano/ext/multistage'
-require 'org.torquebox.capistrano-support'
 
 set :keep_releases, 2
 set :stages, %w[nhealth local]
