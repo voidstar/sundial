@@ -1,4 +1,3 @@
-# source "http://torquebox.org/2x/builds/557/gem-repo"
 source 'http://rubygems.org'
 
 gem 'rails', '3.0.7'
@@ -16,6 +15,7 @@ platforms :jruby do
   gem "activerecord-jdbc-adapter", :require => "arjdbc"
   gem "jdbc-sqlite3"
   gem "jruby-openssl"
+  gem "ffi-ncurses"
 end
 
 # Utility Gems
@@ -29,6 +29,7 @@ gem 'log4r'
 
 # Deploy with Capistrano
 # gem 'capistrano'
+#  gem 'capistrano-ext'
 
 # To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
 # gem 'ruby-debug'
