@@ -15,7 +15,7 @@ platforms :jruby do
   gem "activerecord-jdbc-adapter", :require => "arjdbc"
   gem "jdbc-sqlite3"
   gem "jruby-openssl"
-  gem "ffi-ncurses"
+  # gem "ffi-ncurses"
 end
 
 # Utility Gems
