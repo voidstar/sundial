@@ -5,6 +5,7 @@ set :domain, "nandinahealth.com"
 set :user, "nandinaportal"
 
 set :default_environment, {
+    'RAILS_ENV' => "production",
     'PATH' => "/home/#{user}/.rbenv/shims:/home/#{user}/.rbenv/bin:$PATH"
 }
 

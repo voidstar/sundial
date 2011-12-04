@@ -5,4 +5,8 @@ TorqueBox.configure do
     static "public"
   end
 
+  environment do
+    RAILS_ENV "production"
+  end
+
 end
