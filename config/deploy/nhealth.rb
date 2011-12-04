@@ -24,7 +24,8 @@ role :app, domain                          # This may be the same as your `Web` 
 role :db,  domain, :primary => true # This is where Rails migrations will run
 # role :db,  "your slave db-server here"
 
-set :torquebox_exec, "/etc/init.d/torqued"
+set :torquebox_init, "/etc/init.d/torqued"
+set :torquebox_exec, "torquebox"
 set :torquebox_args, "APP_DIR='#{current_path}'"
 # set :torquebox_args, "RUN_QUARTZ=true "
 
@@ -41,7 +42,7 @@ namespace :torquebox do
   task :start, roles => :app, :except => {:no_release => true} do
     run <<-CMD
       cd #{current_path} && \
-       #{torquebox_args} #{torquebox_exec} start
+       #{torquebox_args} #{torquebox_init} start
     CMD
 
   end
@@ -49,7 +50,7 @@ namespace :torquebox do
   desc "Stopping Sundial application using pid file"
   task :stop, roles => :app, :except => {:no_release => true} do
     run <<-CMD
-       #{torquebox_args} #{torquebox_exec} stop
+       #{torquebox_args} #{torquebox_init} stop
     CMD
   end
 
