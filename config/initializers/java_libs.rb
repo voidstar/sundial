@@ -41,7 +41,7 @@ if run_quartz
   RemoteJobScheduler.instance.run
   # Reload all schedules since last start
   Schedule.all.each {|schedule|
-    RemoteJobScheduler.instance.build(schedule)
+    RemoteJobScheduler.instance.build_schedule(schedule)
   }
 end
 
