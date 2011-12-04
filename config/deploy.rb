@@ -27,6 +27,9 @@ set :bundle_exec, "RAILS_ENV=#{rails_env} bundle exec"
 namespace :deploy do
    task :start do ; end
    task :stop do ; end
+
+   before "deploy:update_code", "torquebox:undeploy"
+
    after "deploy:update_code", :link_production_db
    after "deploy:symlink", "torquebox:deploy"
    after "deploy", "deploy:cleanup"

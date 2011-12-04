@@ -38,6 +38,12 @@ namespace :torquebox do
     run "cd #{current_path} && #{torquebox_exec} deploy ."
   end
 
+  desc "UnDeploy Sundial application from torquebox"
+  task :undeploy, roles => :app, :except => {:no_release => true} do
+    run "cd #{current_path} && #{torquebox_exec} undeploy ."
+  end
+
+
   desc "Stopping Sundial application in background"
   task :start, roles => :app, :except => {:no_release => true} do
     run <<-CMD

@@ -39,10 +39,6 @@ run_quartz = (!ENV['RUN_QUARTZ'].nil? || ENV['RUN_QUARTZ'] == 'true') ? true : f
 
 if run_quartz
   RemoteJobScheduler.instance.run
-  # Reload all schedules since last start
-  Schedule.all.each {|schedule|
-    RemoteJobScheduler.instance.build_schedule(schedule)
-  }
 end
 
 
