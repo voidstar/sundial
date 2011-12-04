@@ -14,7 +14,7 @@ set :deploy_via, :export
 set :deploy_to, appdir
 set :port, 2552
 
-ssh_options[:forward_agent] = true
+# ssh_options[:forward_agent] = true
 
 set :use_sudo, false
 
@@ -23,8 +23,10 @@ role :app, domain                          # This may be the same as your `Web` 
 role :db,  domain, :primary => true # This is where Rails migrations will run
 # role :db,  "your slave db-server here"
 
-set :torquebox_exec, "/home/#{user}/.rbenv/shims/torquebox"
-set :torquebox_args, "RUN_QUARTZ=true JBOSS_PIDFILE=#{current_path}/tmp/pids/jboss.pid LAUNCH_JBOSS_IN_BACKGROUND=Y"
+set :torquebox_exec, "/etc/init.d/torqued"
+set :torquebox_args, "APP_DIR='#{current_path}'"
+# set :torquebox_args, "RUN_QUARTZ=true "
+
 namespace :torquebox do
 
   #JBOSS_PIDFILE=#{current_path}}/tmp/jboss.pid LAUNCH_JBOSS_IN_BACKGROUND=t torquebox run &
@@ -37,10 +39,8 @@ namespace :torquebox do
   desc "Stopping Sundial application in background"
   task :start, roles => :app, :except => {:no_release => true} do
     run <<-CMD
-      cd #{current_path}
-      mkdir -p #{current_path}/tmp/pids
-      JBOSS_PIDFILE=#{current_path}/tmp/pids
-      #{torquebox_args} #{torquebox_exec} run -b 0.0.0.0
+      cd #{current_path} && \
+       #{torquebox_args} #{torquebox_exec} start
     CMD
 
   end
@@ -48,9 +48,7 @@ namespace :torquebox do
   desc "Stopping Sundial application using pid file"
   task :stop, roles => :app, :except => {:no_release => true} do
     run <<-CMD
-      cd #{current_path}
-      proc=`cat tmp/pids/jboss.pid`
-      kill $proc
+       #{torquebox_args} #{torquebox_exec} stop
     CMD
   end
 

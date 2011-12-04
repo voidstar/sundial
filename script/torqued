@@ -1,0 +1,99 @@
+#!/bin/sh -e
+### BEGIN INIT INFO
+# Provides:          torquebox
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Start/stop Torquebox app server
+### END INIT INFO
+#
+# torqued		This init.d script is used to start torquebox.
+
+if [ -x /home/nandinaportal/.rbenv/shims/torquebox ] ; then
+	HAVE_TORQUEBOX=1
+else
+	echo "Torquebox is not installed"
+	exit 1
+fi
+
+. /lib/lsb/init-functions
+
+
+NAME='java'
+TORQUEBOX="/home/nandinaportal/.rbenv/shims/torquebox"
+TARGS="run -b 0.0.0.0"
+
+if [ -z $APP_DIR ] ; then
+	echo ERROR: APP_DIR needs to be defined
+	exit 2
+fi
+
+PID_FILE="$APP_DIR/tmp/pids/torquebox"
+export JBOSS_PIDFILE="$PID_FILE.jboss"
+
+test -f /lib/lsb/init-functions || exit 1
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+
+    if [ -f $PID_FILE ] ; then
+      PROC=`cat $PID_FILE`
+      echo "Torquebox server is already running with process $PROC"
+      exit 1
+    fi
+
+    export RUN_QUARTZ="true"
+    export LAUNCH_JBOSS_IN_BACKGROUND="Y"
+
+    log_begin_msg "Starting torquebox application server..."
+    start-stop-daemon -u nandinaportal -b -m -d $APP_DIR --start -v -p $PID_FILE --exec "$TORQUEBOX" -- $TARGS || return 1
+    ;;
+  stop)
+    log_begin_msg "Stopping Torquebox application server ..."
+    # Return
+    #   0 if daemon has been stopped
+    #   1 if daemon was already stopped
+    #   2 if daemon could not be stopped
+    #   other if a failure occurred
+    #start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --name "java"
+    #start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --name "jruby"
+
+    JBOSSPROC=`cat $JBOSS_PIDFILE`
+    echo "Attempting to stop Jboss with process $JBOSSPROC"
+    kill $JBOSSPROC
+    echo "Removing pid file"
+    if [ -f $JBOSS_PIDFILE ] ; then
+      rm -f $JBOSS_PIDFILE
+    fi
+
+    echo "Attempting to stop torquebox and its child processes"
+    start-stop-daemon --stop --verbose -retry=TERM/30/KILL/5 --pidfile $PID_FILE --test
+    RETVAL="$?"
+
+    if [ $RETVAL == 0 ]  ; then
+      start-stop-daemon --stop --verbose -retry=TERM/30/KILL/5 --pidfile $PID_FILE
+      if [ -f $PID_FILE ]; then
+        rm -f $PID_FILE
+      fi
+    else
+      if [ -f $PID_FILE ]; then
+        rm -f $PID_FILE
+      fi
+    fi
+
+    return "$RETVAL"
+    ;;
+  status)
+     if [ -x $PID_FILE ] ; then
+        echo "torquebox is running, or $PID_FILE exists"
+      else
+        echo "torquebox has stopped, or $PID_FILE does not exist"
+     fi
+    ;;
+  *)
+    log_success_msg "Usage: /etc/init.d/torqued {start|stop|status}"
+  exit 1
+esac
+
+exit $?

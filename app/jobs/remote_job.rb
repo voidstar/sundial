@@ -1,5 +1,6 @@
 require 'java'
 require 'net/http'
+require 'net/https'
 
 java_import org.quartz.Job
 java_import import org.quartz.JobExecutionContext
@@ -38,10 +39,15 @@ class RemoteJob
         req.form_data = params
       end
 
-      Net::HTTP.start(url.host, url.port) { |http|
-        http.read_timeout = 120
-        response = http.request(req)
-      }
+      http = Net::HTTP.new(url.host, url.port)
+      http.read_timeout = 30
+      if url.scheme == "https"
+        http.use_ssl = true
+        # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        # TODO: see the following url to improve security :
+        #   http://www.rubyinside.com/how-to-cure-nethttps-risky-default-https-behavior-4010.html
+      end
+      response = http.request(req)
       status = response['status']
       Rails.logger.info response.body
     rescue => e

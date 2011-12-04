@@ -28,6 +28,7 @@ namespace :deploy do
    task :start do ; end
    task :stop do ; end
    after "deploy:update_code", :link_production_db
+   after "deploy:symlink", "torquebox:deploy"
    after "deploy", "deploy:cleanup"
   # TODO: Add Jammit, Uglifier, Closuer, etc
 end
