@@ -17,7 +17,7 @@ class RemoteJob
     begin
       execute_task(context)
     rescue Exception => e
-      raise StandardError.new(e)
+      Rails.logger.error "CAUGHT EXCEPTION : #{e.message}"
     end
   end
 

@@ -43,7 +43,7 @@ if run_quartz
 
   # Load all jobs
   Schedule.all.each do |s|
-    RemoteJobScheduler.instace.build_schedule(s)
+    RemoteJobScheduler.build_schedule(s)
   end
 end
 
