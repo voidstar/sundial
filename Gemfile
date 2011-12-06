@@ -11,8 +11,7 @@ end
 
 platforms :jruby do
   gem 'activerecord-jdbc-adapter'
-  gem 'jdbc-mysql', :require => false
-  gem "activerecord-jdbc-adapter", :require => "arjdbc"
+  gem 'jdbc-mysql'
   gem "jdbc-sqlite3"
   gem "jruby-openssl"
   # gem "ffi-ncurses"

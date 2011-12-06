@@ -34,11 +34,17 @@ java_import org.quartz.SimpleScheduleBuilder
 java_import org.quartz.TriggerBuilder
 
 require 'remote_job_scheduler'
+require 'quartz/job_factory'
 
 run_quartz = (!ENV['RUN_QUARTZ'].nil? || ENV['RUN_QUARTZ'] == 'true') ? true : false
 
 if run_quartz
   RemoteJobScheduler.instance.run
+
+  # Load all jobs
+  Schedule.all.each do |s|
+    RemoteJobScheduler.instace.build_schedule(s)
+  end
 end
 
 
