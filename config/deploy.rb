@@ -2,7 +2,7 @@ require "bundler/capistrano"
 require 'capistrano/ext/multistage'
 
 set :keep_releases, 2
-set :stages, %w[nhealth]
+set :stages, %w[sundial]
 
 # Include recipes from lib
 Dir['lib/recipes/*.rb'].each { |recipe| load(recipe) }
@@ -28,8 +28,9 @@ namespace :deploy do
    task :start do ; end
    task :stop do ; end
 
-   before "deploy:update_code", "torquebox:undeploy"
+   # before "deploy:update_code", "torquebox:undeploy"
 
+   # Order is honored
    after "deploy:update_code", :link_production_db
    after "deploy:symlink", "torquebox:deploy"
    after "deploy", "deploy:cleanup"

@@ -1,19 +1,18 @@
 
 set :appdir, "/srv/#{application}"
-set :location, "nandinahealth.com"
-set :domain, "nandinahealth.com"
-set :user, "nandinaportal"
+set :location, "50.57.155.218"
+set :domain, "50.57.155.218"
+set :user, "torquebox"
 
 set :default_environment, {
-    'RAILS_ENV' => "production",
-    'PATH' => "/home/#{user}/.rbenv/shims:/home/#{user}/.rbenv/bin:$PATH"
+    'RAILS_ENV' => "production"
 }
 
 
 #set :deploy_via, :remote_cache
 set :deploy_via, :export
 set :deploy_to, appdir
-set :port, 2552
+# set :port, 2552
 
 # ssh_options[:forward_agent] = true
 
@@ -24,6 +23,7 @@ role :app, domain                          # This may be the same as your `Web` 
 role :db,  domain, :primary => true # This is where Rails migrations will run
 # role :db,  "your slave db-server here"
 
+begin
 set :torquebox_init, "/etc/init.d/torqued"
 set :torquebox_exec, "torquebox"
 set :torquebox_args, "APP_DIR='#{current_path}'"
@@ -66,4 +66,5 @@ namespace :torquebox do
     start
   end
 
+end
 end
