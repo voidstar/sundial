@@ -10,7 +10,7 @@ platforms :ruby do
 end
 
 platforms :jruby do
-  gem 'activerecord-jdbc-adapter'
+  gem 'activerecord-jdbcmysql-adapter'
   gem 'jdbc-mysql'
   gem "jdbc-sqlite3"
   gem "jruby-openssl"

@@ -25,6 +25,9 @@ GEM
       arel (~> 2.0.2)
       tzinfo (~> 0.3.23)
     activerecord-jdbc-adapter (1.2.1)
+    activerecord-jdbcmysql-adapter (1.2.1)
+      activerecord-jdbc-adapter (~> 1.2.1)
+      jdbc-mysql (~> 5.1.0)
     activeresource (3.0.7)
       activemodel (= 3.0.7)
       activesupport (= 3.0.7)
@@ -127,7 +130,7 @@ PLATFORMS
   java
 
 DEPENDENCIES
-  activerecord-jdbc-adapter
+  activerecord-jdbcmysql-adapter
   capistrano
   capistrano-ext
   jdbc-mysql
