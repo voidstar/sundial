@@ -1,6 +1,9 @@
 require 'quartz/job_detail'
 
 java_import java.util.TimeZone
+java_import java.text.SimpleDateFormat
+java_import java.text.DateFormat
+java_import java.util.Date
 
 # Quartz Scheduler API Adapter
 # Wraps Quartz Scheduler DSL for Jobs and Triggers
@@ -23,14 +26,15 @@ module Quartz
 
     module InstanceMethods
 
+      # @param schedule [Object]
       def build_schedule(schedule)
 
         unless schedule.class.to_s == "Schedule"
           raise "Cannot build a schedule in Quartz Scheduler without schedule object"
         end
 
-        unless schedule.cron
-          raise "Cannot process Schedule object without cron expression"
+        if schedule.cron.nil? && schedule.timing.nil?
+          raise "Cannot process Schedule object without cron expression or timing date string"
         end
 
         # Determine time zone for cron.  Default to Pacific
@@ -40,10 +44,26 @@ module Quartz
         job_detail = Quartz::JobDetail.new(schedule.name, schedule.group, RemoteJob.new)
         job_detail.schedule_id = schedule.id
 
-        trigger = TriggerBuilder.newTrigger()\
-        .withIdentity("#{schedule.name}_trigger", schedule.group)\
-        .withSchedule(CronScheduleBuilder.cronSchedule(schedule.cron))\
-        .build();
+        trigger = nil
+
+        unless schedule.cron.nil?
+          trigger = TriggerBuilder.newTrigger()\
+          .withIdentity("#{schedule.name}_trigger", schedule.group)\
+          .withSchedule(CronScheduleBuilder.cronSchedule(schedule.cron))\
+          .build();
+        else
+
+          formatter = SimpleDateFormat.new("MM-dd-yy h:m a");
+          date = formatter.parse(schedule.timing);
+
+          Rails.logger.info "Scheduling datetime for : #{date}"
+
+          trigger = TriggerBuilder.newTrigger()\
+          .withIdentity("#{schedule.name}_trigger", schedule.group)\
+          .startAt(date)\
+          .withSchedule(SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0))\
+          .build();
+        end
 
         scheduler.set_job_factory(JobFactory.instance)
         scheduler.schedule_job(job_detail, trigger)

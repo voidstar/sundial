@@ -11,4 +11,5 @@ db/schema.rb
 .bundle
 vendor/bundle/jruby
 vendor/java
+config/torquebox.rb
 

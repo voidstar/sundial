@@ -75,6 +75,7 @@ class RemoteJob
       http = Net::HTTP.new(url.host, url.port)
       http.read_timeout = 30
       if url.scheme == "https"
+        Rails.logger.info "Using HTTPS to connect to remote client"
         http.use_ssl = true
         # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
         # TODO: see the following url to improve security :

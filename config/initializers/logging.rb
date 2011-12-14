@@ -17,5 +17,5 @@ y_cfg.load_yaml_file(Rails.root.to_s + '/config/log4r.yml')
 
 Rails.logger = Log4r::Logger['default']
 Rails.logger.level = (Rails.env == 'development' ? Log4r::DEBUG : Log4r::INFO)
-ActiveRecord::Base.logger = Log4r::Logger['sql']
+# ActiveRecord::Base.logger = Log4r::Logger['sql']
 

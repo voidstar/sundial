@@ -61,14 +61,20 @@ class SchedulesController < ApplicationController
 
       render :json => {:schedule_id => @schedule.id, :msg => 'schedule already exists'}
     else
-
-      @schedule = Schedule.build(schedule_params)
+      begin
+        @schedule = Schedule.build(schedule_params)
+      rescue => e
+        Rails.logger.error "Could not create schedule : #{e.message}"
+        render :json => {:error => e.message}
+        return
+      end
 
       if @schedule.save
         begin
           RemoteJobScheduler.instance.build_schedule(@schedule)
           render :json => {:schedule_id => @schedule.id}
         rescue => e
+          Rails.logger.error "Could not create schedule : #{e.message}"
           render :json => {:error => e.message}
         end
 

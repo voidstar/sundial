@@ -1,6 +1,8 @@
 class Schedule < ActiveRecord::Base
 
-  validates_presence_of :name, :group, :cron, :callback_url
+  validates_presence_of :name, :group, :callback_url
+  validates_presence_of :cron, :if => Proc.new {|s| s.timing.nil? }
+  validates_presence_of :timing, :if => Proc.new {|s| s.cron.nil? }
   validates_uniqueness_of :name, :scope => :group
 
 
@@ -15,6 +17,7 @@ class Schedule < ActiveRecord::Base
       s.time_zone = params[:time_zone]
       s.callback_url = params[:callback_url]
       s.callback_params = params[:callback_params]
+      s.timing = params[:timing]
       return s
     end
 
