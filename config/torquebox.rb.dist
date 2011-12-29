@@ -9,4 +9,8 @@ TorqueBox.configure do
     RAILS_ENV "development"
   end
 
+  ruby do
+    version "1.9"
+  end
+
 end

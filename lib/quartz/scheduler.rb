@@ -3,12 +3,18 @@ require 'quartz/job_detail'
 java_import java.util.TimeZone
 java_import java.text.SimpleDateFormat
 java_import java.text.DateFormat
-java_import java.util.Date
 
 # Quartz Scheduler API Adapter
 # Wraps Quartz Scheduler DSL for Jobs and Triggers
 module Quartz
   module Scheduler
+
+    @@logger = nil
+
+    # Returns Logger
+    def logger
+      @@logger ||= Log4r::Logger.new("Scheduler::Quartz::Scheduler")
+    end
 
     def self.included(base)
       base.class_eval <<-EOF
@@ -47,20 +53,22 @@ module Quartz
         trigger = nil
 
         unless schedule.cron.nil?
+          logger.info("Scheduling reminder with cron [#{schedule.cron}] for recurring schedule [#{schedule.id}]")
           trigger = TriggerBuilder.newTrigger()\
           .withIdentity("#{schedule.name}_trigger", schedule.group)\
           .withSchedule(CronScheduleBuilder.cronSchedule(schedule.cron))\
           .build();
         else
 
-          formatter = SimpleDateFormat.new("MM-dd-yy h:m a");
-          date = formatter.parse(schedule.timing);
+          formatter = SimpleDateFormat.new(Sundial::Config.java_simpledate_format)
+          timing = DateTime.strptime(schedule.timing, Sundial::Config.datetime_format)
+          startAtDate = formatter.parse(timing.strftime(Sundial::Config.datetime_format))
 
-          Rails.logger.info "Scheduling datetime for : #{date}"
+          logger.info("Building trigger with datetime [#{startAtDate}] for non-recurring schedule [#{schedule.id}]")
 
           trigger = TriggerBuilder.newTrigger()\
           .withIdentity("#{schedule.name}_trigger", schedule.group)\
-          .startAt(date)\
+          .startAt(startAtDate)\
           .withSchedule(SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0))\
           .build();
         end

@@ -17,6 +17,9 @@ platforms :jruby do
   # gem "ffi-ncurses"
 end
 
+#Common Application Gems
+gem 'aasm', '>=2.2.0' # State machine
+
 # Utility Gems
 gem 'pry'
 gem 'pry-doc'
@@ -54,5 +57,9 @@ group :development, :test do
   gem 'capistrano'
   gem 'capistrano-ext'
 
+end
+
+group :test do
+  gem 'factory_girl'
 end
 

@@ -1,6 +1,8 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    aasm (3.0.1)
+      activerecord
     abstract (1.0.0)
     actionmailer (3.0.7)
       actionpack (= 3.0.7)
@@ -47,6 +49,8 @@ GEM
     diff-lcs (1.1.3)
     erubis (2.6.6)
       abstract (>= 1.0.0)
+    factory_girl (2.3.2)
+      activesupport
     highline (1.6.8)
     i18n (0.5.0)
     jdbc-mysql (5.1.13)
@@ -130,9 +134,11 @@ PLATFORMS
   java
 
 DEPENDENCIES
+  aasm (>= 2.2.0)
   activerecord-jdbcmysql-adapter
   capistrano
   capistrano-ext
+  factory_girl
   jdbc-mysql
   jdbc-sqlite3
   jruby-openssl

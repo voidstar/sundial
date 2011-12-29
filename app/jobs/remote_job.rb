@@ -9,26 +9,30 @@ java_import import org.quartz.JobExecutionException
 class RemoteJob
   include org.quartz.Job
 
-  def initialize()
-    ;
+  @logger = nil
+
+  def logger
+    @logger ||= Log4r::Logger.new('Scheduler::RemoteJob')
   end
+
+  def initialize; end
 
   def execute(context)
     begin
       execute_task(context)
     rescue Exception => e
-      Rails.logger.error "CAUGHT EXCEPTION : #{e.message}"
+      logger.error("CAUGHT EXCEPTION : #{e.message}")
     end
   end
 
-  def test schedule
+  def test(schedule)
 
     response = nil
     begin
       url = URI.parse(schedule.callback_url)
       req = Net::HTTP::Post.new(url.request_uri)
 
-      Rails.logger.info "Callback Params : #{schedule.callback_params}"
+      logger.info("Schedule [#{schedule.id}] with callback params [#{schedule.callback_params}]")
       unless schedule.callback_params.nil?
         params = ActiveSupport::JSON.decode(schedule.callback_params)
         req.form_data = params
@@ -44,9 +48,9 @@ class RemoteJob
       end
       response = http.request(req)
       status = response['status']
-      Rails.logger.info response.body
+      logger.info("Schedule [#{schedule.id}] with response [#{response.body}]")
     rescue => e
-      Rails.logger.error "Exception: #{e.message}"
+      logger.error("Schedule [#{schedule.id}] raised exception: #{e.message}")
     end
 
     response
@@ -57,16 +61,23 @@ class RemoteJob
 
   def execute_task(context)
     detail = context.get_job_detail
-    Rails.logger.info "Executing schedule with ID :  #{detail.schedule_id}"
+    logger.info("Executing task for schedule [#{detail.schedule_id}]")
     schedule = Schedule.find_by_id(detail.schedule_id)
 
-    Rails.logger.info "Processing schedule with id : #{detail.schedule_id}"
+    logger.info("Found schedule [#{schedule.id}] so will begin processing....")
     response = nil
     begin
+      unless schedule.within_threshold?
+        logger.warn("Didn't invoke callback for schedule [#{schedule.id}] with"\
+          " timer [#{schedule.timing} #{schedule.time_zone}] and threshold [#{schedule.threshold}] as its now past the"\
+          " schedule's callback window")
+        #schedule.finish_after_threshold!
+        return
+      end
       url = URI.parse(schedule.callback_url)
       req = Net::HTTP::Post.new(url.request_uri)
 
-      Rails.logger.info "Callback Params : #{schedule.callback_params}"
+      logger.info("Schedule [#{schedule.id}] using callback params [#{schedule.callback_params}]")
       unless schedule.callback_params.nil?
         params = ActiveSupport::JSON.decode(schedule.callback_params)
         req.form_data = params
@@ -75,7 +86,7 @@ class RemoteJob
       http = Net::HTTP.new(url.host, url.port)
       http.read_timeout = 30
       if url.scheme == "https"
-        Rails.logger.info "Using HTTPS to connect to remote client"
+        logger.info("Schedule [#{schdule.id}] using HTTPS to connect to remote client")
         http.use_ssl = true
         # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
         # TODO: see the following url to improve security :
@@ -83,11 +94,13 @@ class RemoteJob
       end
       response = http.request(req)
       status = response['status']
-      Rails.logger.info response.body
+      logger.info("Schedule [#{schedule.id}] received response: #{response.body}")
+      #schedule.finish!
     rescue => e
-      Rails.logger.error "Exception: #{e.message}"
+      logger.error("Schedule [#{schedule.id}] raised exception: #{e.message}")
+      #schedule.fail_finish!
     end
   end
-
 end
+
 
