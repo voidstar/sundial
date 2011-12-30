@@ -68,9 +68,7 @@ class RemoteJob
     response = nil
     begin
       unless schedule.within_threshold?
-        logger.warn("Didn't invoke callback for schedule [#{schedule.id}] with"\
-          " timer [#{schedule.timing} #{schedule.time_zone}] and threshold [#{schedule.threshold}] as its now past the"\
-          " schedule's callback window")
+        logger.warn("Didn't invoke callback for schedule [#{schedule.id}] as its now past the schedule's callback window")
         #schedule.finish_after_threshold!
         return
       end

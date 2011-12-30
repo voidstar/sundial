@@ -53,24 +53,30 @@ module Quartz
         trigger = nil
 
         unless schedule.cron.nil?
-          logger.info("Scheduling reminder with cron [#{schedule.cron}] for recurring schedule [#{schedule.id}]")
+          logger.info("Scheduling cron [#{schedule.cron}] for recurring schedule [#{schedule.id}]")
           trigger = TriggerBuilder.newTrigger()\
           .withIdentity("#{schedule.name}_trigger", schedule.group)\
           .withSchedule(CronScheduleBuilder.cronSchedule(schedule.cron))\
-          .build();
+          .build()
         else
+          s_utc_offset_sec = ActiveSupport::TimeZone.find_tzinfo(schedule.time_zone).current_period.offset.utc_total_offset
+          s_utc_offset_hhmm = ActiveSupport::TimeZone.seconds_to_utc_offset(s_utc_offset_sec, false)
 
-          formatter = SimpleDateFormat.new(Sundial::Config.java_simpledate_format)
-          timing = DateTime.strptime(schedule.timing, Sundial::Config.datetime_format)
-          startAtDate = formatter.parse(timing.strftime(Sundial::Config.datetime_format))
+          logger.info("converted schedule#time_zone format [#{schedule.time_zone}] to UTC offset in HHMM format "\
+            "[#{s_utc_offset_hhmm}] for schedule [#{schedule.id}]")
 
-          logger.info("Building trigger with datetime [#{startAtDate}] for non-recurring schedule [#{schedule.id}]")
+          formatter = SimpleDateFormat.new(Sundial::Config.java_simpledate_zone_format)
+          s_dtz = schedule.timing + " #{s_utc_offset_hhmm}"
+          startAtDate = formatter.parse(s_dtz)
+
+          logger.info("Building trigger using local datetime [#{startAtDate}] for non-recurring schedule [#{schedule.id}] "\
+            "with datetime [#{s_dtz}")
 
           trigger = TriggerBuilder.newTrigger()\
           .withIdentity("#{schedule.name}_trigger", schedule.group)\
           .startAt(startAtDate)\
           .withSchedule(SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0))\
-          .build();
+          .build()
         end
 
         scheduler.set_job_factory(JobFactory.instance)
