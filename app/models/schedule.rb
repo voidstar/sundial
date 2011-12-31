@@ -50,17 +50,9 @@ class Schedule < ActiveRecord::Base
   # Determines whether a schedule is within timing threshold at the moment this method is called.
   # The threshold calculation is performed in time zone of the schedule instance.
   def within_threshold?
-    s_utc_offset_sec = ActiveSupport::TimeZone.find_tzinfo(self.time_zone).current_period.offset.utc_total_offset
-    s_utc_offset_hhmm = ActiveSupport::TimeZone.seconds_to_utc_offset(s_utc_offset_sec, false)
-
-    logger.debug("converted schedule#time_zone format [#{self.time_zone}] to UTC offset in HHMM format "\
-      "[#{s_utc_offset_hhmm}] for schedule [#{self.id}]")
-
-    s_timing_threshold = DateTime.strptime(self.timing + " #{s_utc_offset_hhmm}", Sundial::Config.datetime_zone_format).\
-        advance(:seconds => self.threshold)
-    now_utc_offset = Time.now.utc.advance(:seconds => s_timing_threshold.utc_offset)
-    now_in_target_tz = DateTime.strptime(now_utc_offset.strftime(Sundial::Config.datetime_format) + " #{s_utc_offset_hhmm}",\
-      Sundial::Config.datetime_zone_format)
+    s_timing_threshold = Time.strptime(self.timing, Sundial::Config.datetime_format).to_datetime.in_time_zone(self.time_zone).\
+      advance(:seconds => self.threshold)
+    now_in_target_tz = Time.now.to_datetime.in_time_zone(self.time_zone)
 
     logger.info("Checking schedule [#{self.id}] timing threshold [#{s_timing_threshold}] using current time in "\
       "schedule's time zone: #{now_in_target_tz}")

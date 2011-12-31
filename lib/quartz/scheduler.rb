@@ -59,18 +59,12 @@ module Quartz
           .withSchedule(CronScheduleBuilder.cronSchedule(schedule.cron))\
           .build()
         else
-          s_utc_offset_sec = ActiveSupport::TimeZone.find_tzinfo(schedule.time_zone).current_period.offset.utc_total_offset
-          s_utc_offset_hhmm = ActiveSupport::TimeZone.seconds_to_utc_offset(s_utc_offset_sec, false)
-
-          logger.info("converted schedule#time_zone format [#{schedule.time_zone}] to UTC offset in HHMM format "\
-            "[#{s_utc_offset_hhmm}] for schedule [#{schedule.id}]")
-
           formatter = SimpleDateFormat.new(Sundial::Config.java_simpledate_zone_format)
-          s_dtz = schedule.timing + " #{s_utc_offset_hhmm}"
-          startAtDate = formatter.parse(s_dtz)
+          timing = Time.strptime(schedule.timing, Sundial::Config.datetime_format).to_datetime.in_time_zone(schedule.time_zone)
+          startAtDate = formatter.parse(timing.strftime(Sundial::Config.datetime_zone_format))
 
           logger.info("Building trigger using local datetime [#{startAtDate}] for non-recurring schedule [#{schedule.id}] "\
-            "with datetime [#{s_dtz}")
+            "with timing [#{timing}")
 
           trigger = TriggerBuilder.newTrigger()\
           .withIdentity("#{schedule.name}_trigger", schedule.group)\
