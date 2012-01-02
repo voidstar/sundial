@@ -69,7 +69,7 @@ class RemoteJob
     begin
       unless schedule.within_threshold?
         logger.warn("Didn't invoke callback for schedule [#{schedule.id}] as its now past the schedule's callback window")
-        #schedule.finish_after_threshold!
+        schedule.finish_after_threshold!
         return
       end
       url = URI.parse(schedule.callback_url)
@@ -93,10 +93,10 @@ class RemoteJob
       response = http.request(req)
       status = response['status']
       logger.info("Schedule [#{schedule.id}] received response: #{response.body}")
-      #schedule.finish!
+      schedule.finish!
     rescue => e
       logger.error("Schedule [#{schedule.id}] raised exception: #{e.message}")
-      #schedule.fail_finish!
+      schedule.fail_finish!
     end
   end
 end
