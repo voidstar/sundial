@@ -28,7 +28,7 @@ namespace :deploy do
    task :start do ; end
    task :stop do ; end
 
-   # before "deploy:update_code", "torquebox:undeploy"
+   before "deploy:update_code", "torquebox:undeploy"
 
    # Order is honored
    after "deploy:update_code", :link_production_db
@@ -41,6 +41,7 @@ end
 desc "Link in the production database.yml"
 task :link_production_db do
   run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
+  run "ln -nfs #{deploy_to}/shared/config/torquebox.rb #{release_path}/config/torquebox.rb"
 end
 
 

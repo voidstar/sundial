@@ -26,7 +26,7 @@ role :db,  domain, :primary => true # This is where Rails migrations will run
 begin
 set :torquebox_init, "/etc/init.d/torqued"
 set :torquebox_exec, "torquebox"
-set :torquebox_args, "APP_DIR='#{current_path}'"
+# set :torquebox_args, "APP_DIR='#{current_path}'"
 # set :torquebox_args, "RUN_QUARTZ=true "
 
 namespace :torquebox do
