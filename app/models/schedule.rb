@@ -1,8 +1,8 @@
 require 'java'
 
 java_import java.util.TimeZone
-java_import java.text.SimpleDateFormat
-java_import java.text.DateFormat
+# java_import java.text.SimpleDateFormat
+# java_import java.text.DateFormat
 
 class Schedule < ActiveRecord::Base
 
@@ -50,8 +50,9 @@ class Schedule < ActiveRecord::Base
   # Determines whether a schedule is within timing threshold at the moment this method is called.
   # The threshold calculation is performed in time zone of the schedule instance.
   def within_threshold?
-    s_timing_threshold = Time.strptime(self.timing, Sundial::Config.datetime_format).to_datetime.in_time_zone(self.time_zone).\
-      advance(:seconds => self.threshold)
+    s_timing_threshold = Time.strptime(self.timing,
+                                       Sundial::Config.datetime_format).to_datetime. \
+                                       in_time_zone(self.time_zone).advance(:seconds => self.threshold)
     now_in_target_tz = Time.now.to_datetime.in_time_zone(self.time_zone)
 
     logger.info("Checking schedule [#{self.id}] timing threshold [#{s_timing_threshold}] using current time in "\
