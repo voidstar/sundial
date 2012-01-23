@@ -148,5 +148,6 @@ DEPENDENCIES
   pry-doc
   pry-rails
   rails (= 3.0.7)
+  rake
   rspec
   rspec-rails
