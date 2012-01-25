@@ -6,7 +6,7 @@ module Net
     alias_method :original_use_ssl=, :use_ssl=
 
     def use_ssl=(flag)
-      self.ca_file = Rails.root.join('lib/Certificates.cer')
+      self.ca_file = Rails.root.join('lib/certs/Certificates.cer')
       self.verify_mode = OpenSSL::SSL::VERIFY_PEER
       self.original_use_ssl = flag
     end

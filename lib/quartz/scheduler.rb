@@ -59,12 +59,18 @@ module Quartz
           .withSchedule(CronScheduleBuilder.cronSchedule(schedule.cron))\
           .build()
         else
-          formatter = SimpleDateFormat.new(Sundial::Config.java_simpledate_zone_format)
-          timing = Time.strptime(schedule.timing, Sundial::Config.datetime_format).to_datetime.in_time_zone(schedule.time_zone)
-          startAtDate = formatter.parse(timing.strftime(Sundial::Config.datetime_zone_format))
+          formatter = SimpleDateFormat.new(Sundial::Config.java_simpledate_format)
+          # dateTime = DateTime.strptime(schedule.timing, Sundial::Config.datetime_format)
+          # timing = dateTime.in_time_zone(schedule.time_zone)
+          timing = DateTime.strptime(schedule.timing, Sundial::Config.datetime_format)
 
-          logger.info("Building trigger using local datetime [#{startAtDate}] for non-recurring schedule [#{schedule.id}] "\
-            "with timing [#{timing}")
+          logger.info("schedule datetime [#{timing}]")
+
+          # startAtDate = formatter.parse(timing.strftime(Sundial::Config.datetime_zone_format))
+          startAtDate = formatter.parse(timing.strftime(Sundial::Config.datetime_format))
+
+          logger.info("Building trigger using local datetime [#{startAtDate}] for " +
+                       "non-recurring schedule [#{schedule.id}] with timing [#{timing}")
 
           trigger = TriggerBuilder.newTrigger()\
           .withIdentity("#{schedule.name}_trigger", schedule.group)\

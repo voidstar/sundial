@@ -85,8 +85,8 @@ class RemoteJob
       http = Net::HTTP.new(url.host, url.port)
       http.read_timeout = 30
       if url.scheme == "https"
-        logger.info("Schedule [#{schedule.id}] using HTTPS to connect to remote client")
         http.use_ssl = true
+        logger.info("Schedule [#{schedule.id}] using HTTPS to connect to remote client")
         # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
         # TODO: see the following url to improve security :
         #   http://www.rubyinside.com/how-to-cure-nethttps-risky-default-https-behavior-4010.html

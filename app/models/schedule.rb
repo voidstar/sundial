@@ -50,10 +50,14 @@ class Schedule < ActiveRecord::Base
   # Determines whether a schedule is within timing threshold at the moment this method is called.
   # The threshold calculation is performed in time zone of the schedule instance.
   def within_threshold?
-    s_timing_threshold = Time.strptime(self.timing,
-                                       Sundial::Config.datetime_format).to_datetime. \
-                                       in_time_zone(self.time_zone).advance(:seconds => self.threshold)
-    now_in_target_tz = Time.now.to_datetime.in_time_zone(self.time_zone)
+    return true
+    dateTime = DateTime.strptime(self.timing, Sundial::Config.datetime_format)
+
+    # s_timing_threshold = dateTime.in_time_zone(self.time_zone).advance(:seconds => self.threshold)
+    s_timing_threshold = dateTime.advance(:seconds => self.threshold)
+
+    # now_in_target_tz = DateTime.now.in_time_zone(self.time_zone)
+    now_in_target_tz = DateTime.now
 
     logger.info("Checking schedule [#{self.id}] timing threshold [#{s_timing_threshold}] using current time in "\
       "schedule's time zone: #{now_in_target_tz}")
@@ -69,7 +73,7 @@ class Schedule < ActiveRecord::Base
       s.name = params[:name]
       s.group = params[:group]
       s.cron = params[:cron]
-      s.time_zone = params[:time_zone]
+      s.time_zone = CGI::unescapeHTML(params[:time_zone]) rescue nil
       s.callback_url = params[:callback_url]
       s.callback_params = params[:callback_params]
       s.timing = params[:timing]
