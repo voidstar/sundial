@@ -67,7 +67,7 @@ class RemoteJob
     logger.info("Found schedule [#{schedule.id}] so will begin processing....")
     response = nil
     begin
-      logger.warn("Schedule cron : #{schedule.cron}")
+      logger.debug("Schedule cron : #{schedule.cron}")
       if schedule.cron.nil? && !schedule.within_threshold?
         logger.warn("Didn't invoke callback for schedule [#{schedule.id}] as its now past the schedule's callback window")
         schedule.finish_after_threshold!
@@ -76,7 +76,7 @@ class RemoteJob
       url = URI.parse(schedule.callback_url)
       req = Net::HTTP::Post.new(url.request_uri)
 
-      logger.info("Schedule [#{schedule.id}] using callback params [#{schedule.callback_params}]")
+      logger.debug("Schedule [#{schedule.id}] using callback params [#{schedule.callback_params}]")
       unless schedule.callback_params.nil?
         params = ActiveSupport::JSON.decode(schedule.callback_params)
         req.form_data = params
@@ -86,11 +86,10 @@ class RemoteJob
       http.read_timeout = 30
       if url.scheme == "https"
         http.use_ssl = true
-        logger.info("Schedule [#{schedule.id}] using HTTPS to connect to remote client")
       end
       response = http.request(req)
       status = response['status']
-      logger.info("Schedule [#{schedule.id}] received response: #{response.body}")
+      logger.debug("Schedule [#{schedule.id}] received response: #{response.body}")
       schedule.finish! if schedule.cron.nil? # Hack for schedule type - TODO
     rescue => e
       logger.error("Schedule [#{schedule.id}] raised exception: #{e.message}")
