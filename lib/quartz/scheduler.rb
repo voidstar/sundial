@@ -43,44 +43,56 @@ module Quartz
           raise "Cannot process Schedule object without cron expression or timing date string"
         end
 
-        # Determine time zone for cron.  Default to Pacific
-        # zone = Java::Util::TimeZone.new(schedule.time_zone ||= "America/Los_Angeles")
-
         RemoteJob.to_java(org.quartz.Job)
         job_detail = Quartz::JobDetail.new(schedule.name, schedule.group, RemoteJob.new)
         job_detail.schedule_id = schedule.id
 
-        trigger = nil
-
-        unless schedule.cron.nil?
-          logger.info("Scheduling cron [#{schedule.cron}] for recurring schedule [#{schedule.id}]")
-          trigger = TriggerBuilder.newTrigger()\
-          .withIdentity("#{schedule.name}_trigger", schedule.group)\
-          .withSchedule(CronScheduleBuilder.cronSchedule(schedule.cron))\
-          .build()
-        else
-          formatter = SimpleDateFormat.new(Sundial::Config.java_simpledate_format)
-          # dateTime = DateTime.strptime(schedule.timing, Sundial::Config.datetime_format)
-          # timing = dateTime.in_time_zone(schedule.time_zone)
-          timing = DateTime.strptime(schedule.timing, Sundial::Config.datetime_format)
-
-          logger.info("schedule datetime [#{timing}]")
-
-          # startAtDate = formatter.parse(timing.strftime(Sundial::Config.datetime_zone_format))
-          startAtDate = formatter.parse(timing.strftime(Sundial::Config.datetime_format))
-
-          logger.info("Building trigger using local datetime [#{startAtDate}] for " +
-                       "non-recurring schedule [#{schedule.id}] with timing [#{timing}")
-
-          trigger = TriggerBuilder.newTrigger()\
-          .withIdentity("#{schedule.name}_trigger", schedule.group)\
-          .startAt(startAtDate)\
-          .withSchedule(SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0))\
-          .build()
-        end
+        trigger = build_with_trigger(schedule, TriggerBuilder.newTrigger())
 
         scheduler.set_job_factory(JobFactory.instance)
         scheduler.schedule_job(job_detail, trigger)
+      end
+
+      # Update the Schedule using jobKey and schedule with updated attributes
+      def update_schedule_trigger(schedule)
+        Trigger oldTrigger = sched.getTrigger(triggerKey("#{schedule.name}_trigger", schedule.group))
+
+        # obtain a builder that would produce the trigger
+        TriggerBuilder tb = oldTrigger.getTriggerBuilder()
+
+        # update the schedule associated with the builder, and build the new trigger
+        # (other builder methods could be called, to change the trigger in any desired way)
+        Trigger newTrigger = build_with_trigger(schedule, tb)
+
+        sched.rescheduleJob(oldTrigger.getKey(), newTrigger);
+      end
+
+      # Build Trigger from Schedule and Trigger Builder
+      def build_with_trigger(schedule, trigger)
+
+        # If we have timing and not cron, then send single trigger
+        if schedule.cron.nil? && !schedule.timing.nil?
+          formatter = SimpleDateFormat.new(Sundial::Config.java_simpledate_zone_format)
+          startAtDate = formatter.parse(schedule.scheduled_time_local.strftime(Sundial::Config.datetime_zone_format))
+
+          logger.info("Building trigger using local datetime [#{startAtDate}] for " +
+                          "non-recurring schedule [#{schedule.id}] with timing [#{schedule.timing}")
+
+          return trigger.withIdentity("#{schedule.name}_trigger", schedule.group)\
+          .startAt(startAtDate)\
+          .withSchedule(SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0))\
+          .build()
+        else
+          logger.info("Scheduling cron [#{schedule.cron}] for recurring schedule [#{schedule.id}]")
+          return trigger.withIdentity("#{schedule.name}_trigger", schedule.group)\
+          .withSchedule(CronScheduleBuilder.cronSchedule(schedule.cron))\
+          .build()
+        end
+
+      end
+
+      def remove_schedule(jobKey)
+        scheduler.deleteJob(jobKey)
       end
 
       def scheduler_factory

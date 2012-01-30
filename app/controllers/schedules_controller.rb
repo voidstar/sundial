@@ -62,7 +62,7 @@ class SchedulesController < ApplicationController
       render :json => {:schedule_id => @schedule.id, :msg => 'schedule already exists'}
     else
       begin
-        @schedule = Schedule.build(schedule_params)
+        @schedule = Schedule.new(schedule_params)
       rescue => e
         Rails.logger.error "Could not create schedule : #{e.message}"
         render :json => {:error => e.message}
@@ -96,7 +96,20 @@ class SchedulesController < ApplicationController
     @schedule = Schedule.find(params[:id])
 
     respond_to do |format|
+
+      # First create jobkey with existing name,group
+      key = JobKey.new(@schedule.name, @schedule.group)
+
       if @schedule.update_attributes(params[:schedule])
+
+        # reload schedule to refresh attributes
+        @schedule.reload
+
+        # Also update schedule in Quartz, if it already exists
+        if RemoteJobScheduler.instance.scheduler.check_exists(key)
+          RemoteJobScheduler.instance.update_schedule(@schedule)
+        end
+
         format.html { redirect_to(@schedule, :notice => 'Schedule was successfully updated.') }
         format.xml { head :ok }
       else
@@ -110,7 +123,13 @@ class SchedulesController < ApplicationController
   # DELETE /schedules/1.xml
   def destroy
     @schedule = Schedule.find(params[:id])
+
     @schedule.destroy
+
+    key = JobKey.new(@schedule.name, @schedule.group)
+    if RemoteJobScheduler.instance.scheduler.check_exists(key)
+      RemoteJobScheduler.instance.remove_schedule(key)
+    end
 
     respond_to do |format|
       format.html { redirect_to(schedules_url) }

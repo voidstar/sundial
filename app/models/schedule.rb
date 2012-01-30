@@ -7,6 +7,15 @@ java_import java.util.TimeZone
 class Schedule < ActiveRecord::Base
 
   # ------------------------------------------------------------------------------------------------
+  # Security Details
+  # ------------------------------------------------------------------------------------------------
+
+  # Define whitelist to protect against mass assignment
+  # These attributes may be assigned by a hash, but any not listed
+  # here must be set explicitly by mutator methods
+  attr_accessible :name, :group, :cron, :time_zone, :callback_url, :callback_params, :timing, :threshold
+
+  # ------------------------------------------------------------------------------------------------
   # Validations
   # ------------------------------------------------------------------------------------------------
 
@@ -15,6 +24,11 @@ class Schedule < ActiveRecord::Base
   validates_presence_of :timing, :if => Proc.new {|s| s.cron.nil? }
   validates_presence_of :threshold, :if => Proc.new {|s| s.cron.nil?}
   validates_uniqueness_of :name, :scope => :group
+
+  # ------------------------------------------------------------------------------------------------
+  # Data cleansing
+  # ------------------------------------------------------------------------------------------------
+  before_validation :sanitize_time_zone
 
   #-----------------------------------------------------------------------------------------------
   # State Machine plugin
@@ -47,17 +61,25 @@ class Schedule < ActiveRecord::Base
     @logger ||= Log4r::Logger.new('Scheduler::Schedule')
   end
 
+  def scheduled_time_with_zone
+    tz = time_zone.nil? \
+      ? ActiveSupport::TimeZone[Sundial::Config.default_time_zone] :
+        ActiveSupport::TimeZone[time_zone]
+
+    offset = tz.formatted_offset
+    DateTime.strptime("#{timing} #{offset}", Sundial::Config.datetime_zone_format)
+  end
+
+  def scheduled_time_local
+    scheduled_time_with_zone.in_time_zone(Sundial::Config.default_time_zone)
+  end
+
   # Determines whether a schedule is within timing threshold at the moment this method is called.
   # The threshold calculation is performed in time zone of the schedule instance.
   def within_threshold?
-    return true
-    dateTime = DateTime.strptime(self.timing, Sundial::Config.datetime_format)
 
-    # s_timing_threshold = dateTime.in_time_zone(self.time_zone).advance(:seconds => self.threshold)
-    s_timing_threshold = dateTime.advance(:seconds => self.threshold)
-
-    # now_in_target_tz = DateTime.now.in_time_zone(self.time_zone)
-    now_in_target_tz = DateTime.now
+    s_timing_threshold = scheduled_time_local.in(self.threshold)
+    now_in_target_tz = DateTime.now.in_time_zone(Sundial::Config.default_time_zone)
 
     logger.info("Checking schedule [#{self.id}] timing threshold [#{s_timing_threshold}] using current time in "\
       "schedule's time zone: #{now_in_target_tz}")
@@ -65,21 +87,12 @@ class Schedule < ActiveRecord::Base
     return now_in_target_tz <= s_timing_threshold
   end
 
-  class << self
+  private
 
-    # prevent bulk insert save build method
-    def build(params)
-      s = Schedule.new
-      s.name = params[:name]
-      s.group = params[:group]
-      s.cron = params[:cron]
-      s.time_zone = CGI::unescapeHTML(params[:time_zone]) rescue nil
-      s.callback_url = params[:callback_url]
-      s.callback_params = params[:callback_params]
-      s.timing = params[:timing]
-      s.threshold = params[:threshold]
-      return s
+  def sanitize_time_zone
+    if attribute_present?("time_zone") && time_zone.is_a?(String)
+      self.time_zone = CGI::unescapeHTML(time_zone)
     end
-
   end
+
 end

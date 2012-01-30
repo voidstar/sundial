@@ -87,9 +87,6 @@ class RemoteJob
       if url.scheme == "https"
         http.use_ssl = true
         logger.info("Schedule [#{schedule.id}] using HTTPS to connect to remote client")
-        # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        # TODO: see the following url to improve security :
-        #   http://www.rubyinside.com/how-to-cure-nethttps-risky-default-https-behavior-4010.html
       end
       response = http.request(req)
       status = response['status']
