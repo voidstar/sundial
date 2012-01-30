@@ -107,7 +107,7 @@ class SchedulesController < ApplicationController
 
         # Also update schedule in Quartz, if it already exists
         if RemoteJobScheduler.instance.scheduler.check_exists(key)
-          RemoteJobScheduler.instance.update_schedule(@schedule)
+          RemoteJobScheduler.instance.update_schedule_trigger(@schedule)
         end
 
         format.html { redirect_to(@schedule, :notice => 'Schedule was successfully updated.') }

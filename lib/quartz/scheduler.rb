@@ -55,16 +55,16 @@ module Quartz
 
       # Update the Schedule using jobKey and schedule with updated attributes
       def update_schedule_trigger(schedule)
-        Trigger oldTrigger = sched.getTrigger(triggerKey("#{schedule.name}_trigger", schedule.group))
+        oldTrigger = scheduler.getTrigger(TriggerKey.new("#{schedule.name}_trigger", schedule.group))
 
         # obtain a builder that would produce the trigger
-        TriggerBuilder tb = oldTrigger.getTriggerBuilder()
+        tb = oldTrigger.getTriggerBuilder()
 
         # update the schedule associated with the builder, and build the new trigger
         # (other builder methods could be called, to change the trigger in any desired way)
-        Trigger newTrigger = build_with_trigger(schedule, tb)
+        newTrigger = build_with_trigger(schedule, tb)
 
-        sched.rescheduleJob(oldTrigger.getKey(), newTrigger);
+        scheduler.rescheduleJob(oldTrigger.getKey(), newTrigger)
       end
 
       # Build Trigger from Schedule and Trigger Builder

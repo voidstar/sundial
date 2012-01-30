@@ -32,6 +32,8 @@ java_import org.quartz.CronScheduleBuilder
 java_import org.quartz.SimpleTrigger
 java_import org.quartz.SimpleScheduleBuilder
 java_import org.quartz.TriggerBuilder
+java_import org.quartz.TriggerKey
+java_import org.quartz.Trigger
 
 require 'remote_job_scheduler'
 require 'quartz/job_factory'
