@@ -86,6 +86,9 @@ class RemoteJob
       http.read_timeout = 30
       if url.scheme == "https"
         http.use_ssl = true
+
+        # reset in to verify none if requested
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE unless Sundial::Config.verify_ssl_cert
       end
       response = http.request(req)
       status = response['status']

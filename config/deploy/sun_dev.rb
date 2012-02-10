@@ -1,19 +1,15 @@
 
 set :appdir, "/srv/#{application}"
-set :location, "50.57.155.218"
-set :domain, "50.57.155.218"
+set :location, "dev.nandinahealth.com"
+set :domain, "dev.nandinahealth.com"
 set :user, "torquebox"
 
 set :default_environment, {
     'RAILS_ENV' => "production"
 }
 
-
-#set :deploy_via, :remote_cache
 set :deploy_via, :export
 set :deploy_to, appdir
-# set :port, 2552
-
 # ssh_options[:forward_agent] = true
 
 set :use_sudo, false

@@ -11,5 +11,16 @@ Sundial::Config.java_simpledate_zone_format = 'MM-dd-yy h:m a Z'
 Sundial::Config.java_simpledate_format = 'MM-dd-yy h:m a'
 Sundial::Config.default_time_zone = "Pacific Time (US & Canada)"
 
+Sundial::Config.verify_ssl_cert = true
+
+######################################################################################################
+# ENVIRONMENT OVERRIDES
+######################################################################################################
+if "production".eql?(Rails.env)
+  require ::Rails.root.to_s + "/config/config_production"
+elsif "development".eql?(Rails.env)
+  require ::Rails.root.to_s + "/config/config_development"
+end
+
 
 

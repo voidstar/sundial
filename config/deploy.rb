@@ -2,7 +2,7 @@ require "bundler/capistrano"
 require 'capistrano/ext/multistage'
 
 set :keep_releases, 2
-set :stages, %w[sundial]
+set :stages, %w[sun_dev sun_prod]
 
 # Include recipes from lib
 Dir['lib/recipes/*.rb'].each { |recipe| load(recipe) }
