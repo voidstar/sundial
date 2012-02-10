@@ -42,6 +42,7 @@ desc "Link in the production database.yml"
 task :link_production_db do
   run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
   run "ln -nfs #{deploy_to}/shared/config/torquebox.rb #{release_path}/config/torquebox.rb"
+  run "ln -nfs #{deploy_to}/shared/config/config_user.rb #{release_path}/config/config_user.rb"
 end
 
 

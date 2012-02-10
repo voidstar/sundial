@@ -21,6 +21,7 @@ if "production".eql?(Rails.env)
 elsif "development".eql?(Rails.env)
   require ::Rails.root.to_s + "/config/config_development"
 end
+require ::Rails.root.to_s + "/config/config_user" if File.exists?(::Rails.root.to_s + "/config/config_user")
 
 
 
