@@ -42,9 +42,7 @@ class RemoteJob
       http.read_timeout = 30
       if url.scheme == "https"
         http.use_ssl = true
-        # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        # TODO: see the following url to improve security :
-        #   http://www.rubyinside.com/how-to-cure-nethttps-risky-default-https-behavior-4010.html
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE unless Sundial::Config.verify_ssl_cert
       end
       response = http.request(req)
       status = response['status']
