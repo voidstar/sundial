@@ -1,0 +1,25 @@
+= form_for(@user_session, :html => {:autocomplete => 'off'}) do |f|
+  .error_explanation{:style => "width: 240px; margin-left: auto; margin-right: auto;"}= alert
+  .notice{:style => "width: 240px;margin-left: auto;margin-right: auto;"}= notice
+  - if @user_session.errors.any?
+    .error_explanation
+      - @user_session.errors.full_messages.each do |msg|
+        .err_string= msg
+        %br
+  .login
+    %h3 Login
+    %br/
+    .login_field_container{:style => "width:240px"}
+      .login_field_label{:style => "width: 70px"}
+        %b Email:
+      .field_data{:style => "width: 160px"}
+        = f.text_field :email, :size => 20
+    .login_field_container{:style => "width:240px"}
+      .login_field_label{:style => "width: 70px"}
+        %b Password:
+      .field_data{:style => "width: 160px"}
+        = f.password_field :password, :size => 20
+    %br/
+    = f.submit "Log In", :class => 'form_button', :id => 'login_btn'
+
+

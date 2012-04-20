@@ -19,7 +19,16 @@ platforms :jruby do
   # gem "ffi-ncurses"
 end
 
+gem 'haml' # View Parsing
+gem 'haml-rails'
+gem 'sass' # Stylesheet parsing
+gem 'jquery-rails'
+
+
 #Common Application Gems
+gem 'authlogic' # Authentication
+gem 'cancan', "<= 1.6.5" # Authorization
+gem 'role_model' # User Roles
 gem 'aasm', '>=2.2.0' # State machine
 
 # Utility Gems
